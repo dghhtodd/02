@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>破譯密碼 - 等級2</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f4a2c 100%);
+            color: #fff;
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #00ff9d;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .chances {
+            text-align: center;
+            color: #00ff9d;
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+            font-weight: bold;
+        }
+
+        .guess-row {
+            display: flex;
+            margin: 15px 0;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .row-number {
+            width: 60px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .active {
+            background: rgba(0, 139, 69, 0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 15px rgba(0, 139, 69, 0.3);
+        }
+
+        .digits {
+            display: flex;
+            flex-grow: 1;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .digit {
+            width: 45px;
+            height: 45px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .correct { 
+            background: linear-gradient(145deg, #4CAF50 0%, #45a049 100%);
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76,175,80,0.3);
+        }
+        
+        .wrong-position { 
+            background: linear-gradient(145deg, #FFC107 0%, #ffa000 100%);
+            border-color: #FFC107;
+            box-shadow: 0 0 10px rgba(255,193,7,0.3);
+        }
+        
+        .not-in-code { 
+            background: linear-gradient(145deg, #f44336 0%, #d32f2f 100%);
+            border-color: #f44336;
+            box-shadow: 0 0 10px rgba(244,67,54,0.3);
+        }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 25px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .numpad button {
+            padding: 15px;
+            font-size: 28px;
+            height: 75px;
+            width: 100%;
+            background: linear-gradient(145deg, #333 0%, #222 100%);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: white;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .numpad button:hover:not(:disabled) {
+            background: linear-gradient(145deg, #444 0%, #333 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .numpad button:active:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .numpad button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .numpad button.special {
+            background: linear-gradient(145deg, #008b45 0%, #006400 100%);
+            font-weight: bold;
+            grid-column: span 3;
+        }
+
+        .numpad button.special:hover:not(:disabled) {
+            background: linear-gradient(145deg, #00a050 0%, #008000 100%);
+        }
+
+        .hints {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .hint-item {
+            margin: 8px 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(145deg, #333 0%, #222 100%);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: linear-gradient(145deg, #444 0%, #333 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .numpad {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+                padding: 15px;
+            }
+
+            .numpad button {
+                height: 60px;
+                font-size: 24px;
+            }
+
+            .numpad button.special {
+                grid-column: span 2;
+            }
+
+            .hints {
+                position: static;
+                margin: 20px auto;
+                max-width: 90%;
+            }
+
+            .back-btn {
+                position: static;
+                display: block;
+                margin: 20px auto;
+                width: fit-content;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <a href="index.html" class="back-btn">返回主頁</a>
+        <h1 class="title">破譯密碼 - 等級2</h1>
+        <div class="subtitle">挑戰六位密碼，限10次輸入機會</div>
+        <div class="chances">剩餘機會：<span id="chancesLeft">10</span></div>
+
+        <div class="guess-rows" id="guessRows">
+            <div class="guess-row active">
+                <div class="row-number">01</div>
+                <div class="digits">
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                </div>
+            </div>
+            <div class="guess-row">
+                <div class="row-number">02</div>
+                <div class="digits">
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                </div>
+            </div>
+            <div class="guess-row">
+                <div class="row-number">03</div>
+                <div class="digits">
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                </div>
+            </div>
+            <div class="guess-row">
+                <div class="row-number">04</div>
+                <div class="digits">
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                </div>
+            </div>
+            <div class="guess-row">
+                <div class="row-number">05</div>
+                <div class="digits">
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                </div>
+            </div>
+            <div class="guess-row">
+                <div class="row-number">06</div>
+                <div class="digits">
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                </div>
+            </div>
+            <div class="guess-row">
+                <div class="row-number">07</div>
+                <div class="digits">
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                </div>
+            </div>
+            <div class="guess-row">
+                <div class="row-number">08</div>
+                <div class="digits">
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                </div>
+            </div>
+            <div class="guess-row">
+                <div class="row-number">09</div>
+                <div class="digits">
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                </div>
+            </div>
+            <div class="guess-row">
+                <div class="row-number">10</div>
+                <div class="digits">
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                    <div class="digit"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="numpad" id="numpad">
+            <button data-digit="1">1</button>
+            <button data-digit="2">2</button>
+            <button data-digit="3">3</button>
+            <button data-digit="4">4</button>
+            <button data-digit="5">5</button>
+            <button data-digit="6">6</button>
+            <button data-digit="7">7</button>
+            <button data-digit="8">8</button>
+            <button data-digit="9">9</button>
+            <button data-digit="10">10</button>
+            <button data-digit="11">11</button>
+            <button data-digit="12">12</button>
+            <button data-digit="13">13</button>
+            <button data-digit="14">14</button>
+            <button data-digit="15">15</button>
+            <button class="special" id="deleteBtn">←</button>
+            <button class="special" id="submitBtn">輸入</button>
+        </div>
+
+        <div class="hints">
+            <div class="hint-item">• 六位密碼數字不相同</div>
+            <div class="hint-item">• 綠色✓代表數字和位置都正確</div>
+            <div class="hint-item">• 紅色✗代表此數字不在密碼中</div>
+            <div class="hint-item">• 黃色△代表此數字位置不正確</div>
+        </div>
+    </div>
+
+    <script>
+        let secretCode = [];
+        let currentAttempt = 1;
+        let currentDigits = [];
+        let isProcessing = false;
+
+        function initGame() {
+            secretCode = generateCode();
+            console.log("密码是：", secretCode.join(''));
+            setupEventListeners();
+        }
+
+        function generateCode() {
+            const numbers = Array.from({length: 15}, (_, i) => i + 1);
+            const code = [];
+            for (let i = 0; i < 6; i++) {
+                const index = Math.floor(Math.random() * numbers.length);
+                code.push(numbers.splice(index, 1)[0]);
+            }
+            return code;
+        }
+
+        function setupEventListeners() {
+            const numpad = document.getElementById('numpad');
+            
+            numpad.addEventListener('click', handleButtonClick);
+            numpad.addEventListener('touchstart', handleButtonClick, {passive: false});
+            document.addEventListener('keydown', handleKeyPress);
+        }
+
+        function handleButtonClick(e) {
+            e.preventDefault();
+            if (isProcessing) return;
+
+            const button = e.target.closest('button');
+            if (!button) return;
+
+            isProcessing = true;
+            button.style.transform = 'scale(0.95)';
+
+            if (button.dataset.digit) {
+                inputDigit(parseInt(button.dataset.digit));
+            } else if (button.id === 'deleteBtn') {
+                deleteLastDigit();
+            } else if (button.id === 'submitBtn') {
+                submitGuess();
+            }
+
+            setTimeout(() => {
+                button.style.transform = '';
+                isProcessing = false;
+            }, 100);
+        }
+
+        function handleKeyPress(e) {
+            if (isProcessing) return;
+
+            if (/^[0-9]$/.test(e.key)) {
+                inputDigit(parseInt(e.key));
+            } else if (e.key === 'Backspace' || e.key === 'Delete') {
+                deleteLastDigit();
+            } else if (e.key === 'Enter') {
+                submitGuess();
+            }
+        }
+
+        function inputDigit(digit) {
+            if (currentDigits.length >= 6) return;
+            if (currentDigits.includes(digit)) {
+                alert('同一排不能輸入重複的數字！');
+                return;
+            }
+            
+            currentDigits.push(digit);
+            updateDisplay();
+            updateNumpadState();
+        }
+
+        function deleteLastDigit() {
+            if (currentDigits.length > 0) {
+                currentDigits.pop();
+                updateDisplay();
+                updateNumpadState();
+            }
+        }
+
+        function submitGuess() {
+            if (currentDigits.length !== 6) {
+                alert('請輸入6位數字！');
+                return;
+            }
+
+            const result = currentDigits.map((num, i) => {
+                if (num === secretCode[i]) return 'correct';
+                if (secretCode.includes(num)) return 'wrong-position';
+                return 'not-in-code';
+            });
+
+            updateRowStatus(result);
+
+            if (result.every(r => r === 'correct')) {
+                setTimeout(() => {
+                    alert('恭喜你，破解成功！');
+                    location.reload();
+                }, 300);
+                return;
+            }
+
+            currentAttempt++;
+            currentDigits = [];
+            updateNumpadState();
+            
+            const chancesLeft = 11 - currentAttempt;
+            document.getElementById('chancesLeft').textContent = chancesLeft;
+
+            if (currentAttempt > 10) {
+                setTimeout(() => {
+                    alert(`遊戲結束！正確密碼是：${secretCode.join('')}`);
+                    location.reload();
+                }, 300);
+                return;
+            }
+
+            const oldRow = document.querySelector('.guess-row.active');
+            const newRow = document.querySelector(`.guess-row:nth-child(${currentAttempt})`);
+            oldRow.classList.remove('active');
+            newRow.classList.add('active');
+        }
+        function updateDisplay() {
+            const activeRow = document.querySelector('.guess-row.active');
+            const digits = activeRow.querySelectorAll('.digit');
+            digits.forEach((digit, i) => {
+                digit.textContent = i < currentDigits.length ? currentDigits[i] : '';
+            });
+        }
+
+        function updateRowStatus(result) {
+            const activeRow = document.querySelector('.guess-row.active');
+            const digits = activeRow.querySelectorAll('.digit');
+            digits.forEach((digit, i) => {
+                digit.className = `digit ${result[i]}`;
+            });
+        }
+
+        function updateNumpadState() {
+            const buttons = document.querySelectorAll('.numpad button[data-digit]');
+            buttons.forEach(button => {
+                const digit = parseInt(button.dataset.digit);
+                const isUsed = currentDigits.includes(digit);
+                button.disabled = isUsed;
+            });
+        }
+
+        // 初始化游戏
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>

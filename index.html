@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>密碼破譯大師</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f2a4a 100%);
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 0;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            color: #00c3ff;
+            text-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(0, 195, 255, 0.5); }
+            to { text-shadow: 0 0 20px rgba(0, 195, 255, 0.8), 0 0 30px rgba(0, 195, 255, 0.6); }
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: #ccc;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .level-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        .level-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(0, 195, 255, 0.3);
+        }
+
+        .level-card h2 {
+            color: #00c3ff;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid rgba(0, 195, 255, 0.3);
+            padding-bottom: 15px;
+        }
+
+        .level-card p {
+            color: #fff;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .level-card ul {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .level-card ul li {
+            margin: 10px 0;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+        }
+
+        .level-card ul li::before {
+            content: "•";
+            color: #00c3ff;
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .start-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #00c3ff, #0066cc);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 195, 255, 0.4);
+        }
+
+        .start-btn:active {
+            transform: translateY(1px);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5em;
+            }
+
+            .level-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>密碼破譯大師</h1>
+        <p>挑戰你的邏輯推理能力，運用策略與智慧，成為最強密碼破譯專家！</p>
+    </header>
+
+    <div class="container">
+        <div class="level-cards">
+            <div class="level-card">
+                <h2>等級一：密碼學徒</h2>
+                <p>踏上密碼破譯之旅的第一步</p>
+                <ul>
+                    <li>四位數字密碼挑戰</li>
+                    <li>六次破解機會</li>
+                    <li>即時顏色提示系統</li>
+                    <li>適合入門級挑戰者</li>
+                </ul>
+                <a href="level1.html" class="start-btn">開始挑戰</a>
+            </div>
+
+            <div class="level-card">
+                <h2>等級二：進階解密師</h2>
+                <p>提升你的破解技巧，迎接更大挑戰</p>
+                <ul>
+                    <li>六位數字密碼挑戰</li>
+                    <li>十次破解機會</li>
+                    <li>擴展的數字範圍</li>
+                    <li>需要更強的策略思維</li>
+                </ul>
+                <a href="level2.html" class="start-btn">接受挑戰</a>
+            </div>
+
+            <div class="level-card">
+                <h2>等級三：密碼大師</h2>
+                <p>終極挑戰，證明你的實力！</p>
+                <ul>
+                    <li>八位數字密碼終極戰</li>
+                    <li>十二次破解機會</li>
+                    <li>最高難度挑戰</li>
+                    <li>成為真正的密碼大師</li>
+                </ul>
+                <a href="level3.html" class="start-btn">挑戰極限</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
