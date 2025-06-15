@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>密码破译大师 - 等级四</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        :root {
+            --primary: #9c27b0;
+            --secondary: #6a1b9a;
+            --tertiary: #4a148c;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #f44336;
+            --hint: #03a9f4;
+            --dark: #1a1a2e;
+            --darker: #0f0f1a;
+            --light: #f0f8ff;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(156, 39, 176, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(106, 27, 154, 0.1) 0%, transparent 20%);
+            z-index: -1;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--duration, 5s) infinite ease-in-out;
+            opacity: var(--opacity, 0.7);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .game-container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 30px;
+            background: rgba(30, 30, 50, 0.25);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--tertiary));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            border-radius: 30px;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .title-container {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            padding-top: 10px;
+        }
+
+        .title {
+            font-size: 3.2rem;
+            margin-bottom: 8px;
+            color: var(--primary);
+            text-shadow: 0 0 20px rgba(156, 39, 176, 0.8);
+            animation: glow 2s ease-in-out infinite alternate;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(156, 39, 176, 0.5); }
+            to { text-shadow: 0 0 30px rgba(156, 39, 176, 0.9), 0 0 50px rgba(106, 27, 154, 0.7); }
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: #d0a0ff;
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 18px 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            color: var(--primary);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #b0c0ff;
+        }
+
+        .hint-btn {
+            background: linear-gradient(145deg, var(--secondary), var(--tertiary));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px auto;
+        }
+
+        .hint-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(106, 27, 154, 0.5);
+        }
+
+        .hint-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .game-content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .game-board {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .game-sidebar {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .guess-rows {
+            margin: 30px 0;
+        }
+
+        .guess-row {
+            display: flex;
+            margin: 15px 0;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .guess-row.active {
+            background: rgba(106, 27, 154, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 25px rgba(106, 27, 154, 0.5);
+            transform: scale(1.02);
+        }
+
+        .row-number {
+            width: 70px;
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .digits {
+            display: flex;
+            flex-grow: 1;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .digit {
+            width: 42px;
+            height: 42px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: bold;
+        }
+
+        .digit.filled {
+            transform: scale(1.05);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(156, 39, 176, 0.3);
+        }
+        
+        .digit.hint-digit {
+            background: linear-gradient(145deg, var(--hint) 0%, #0288d1 100%);
+            border-color: var(--hint);
+            box-shadow: 0 0 15px rgba(3, 169, 244, 0.4);
+            animation: hintFlash 0.8s ease-out;
+        }
+
+        .correct { 
+            background: linear-gradient(145deg, var(--success) 0%, #45a049 100%);
+            border-color: var(--success);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+            animation: correctAnim 0.5s ease-out;
+        }
+        
+        .wrong-position { 
+            background: linear-gradient(145deg, var(--warning) 0%, #ffa000 100%);
+            border-color: var(--warning);
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+            animation: wrongPositionAnim 0.5s ease-out;
+        }
+        
+        .not-in-code { 
+            background: linear-gradient(145deg, var(--danger) 0%, #d32f2f 100%);
+            border-color: var(--danger);
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.4);
+            animation: notInCodeAnim 0.5s ease-out;
+        }
+
+        @keyframes correctAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes wrongPositionAnim {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes notInCodeAnim {
+            0% { transform: rotate(0); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+            100% { transform: rotate(0); }
+        }
+        
+        @keyframes hintFlash {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(3, 169, 244, 0.4); }
+            50% { transform: scale(1.15); box-shadow: 0 0 25px rgba(3, 169, 244, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 15px rgba(3, 169, 244, 0.4); }
+        }
+
+        .symbol {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin: 30px auto;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .numpad button {
+            padding: 10px;
+            font-size: 18px;
+            height: 50px;
+            background: linear-gradient(145deg, #333 0%, #222 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            font-weight: bold;
+        }
+
+        .numpad button:hover:not(:disabled) {
+            background: linear-gradient(145deg, #444 0%, #333 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .numpad button:active:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .numpad button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .numpad button.special {
+            background: linear-gradient(145deg, var(--primary), var(--secondary));
+            font-weight: bold;
+            grid-column: span 3;
+        }
+
+        .numpad button.special:hover:not(:disabled) {
+            background: linear-gradient(145deg, #ab47bc, #7b1fa2);
+        }
+
+        .hints {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            margin-bottom: 20px;
+        }
+
+        .hint-item {
+            margin: 10px 0;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hint-item:last-child {
+            border-bottom: none;
+        }
+
+        .hint-item i {
+            color: var(--primary);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(156, 39, 176, 0.1);
+            border-radius: 50%;
+        }
+
+        .hint-color {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            margin: 0 5px;
+            vertical-align: middle;
+        }
+
+        .hint-color.correct {
+            background: var(--success);
+        }
+
+        .hint-color.wrong-position {
+            background: var(--warning);
+        }
+
+        .hint-color.not-in-code {
+            background: var(--danger);
+        }
+        
+        .hint-color.hint {
+            background: var(--hint);
+        }
+
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            color: #b0c0ff;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .history-panel {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-title {
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1100px) {
+            .numpad {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .game-content {
+                flex-direction: column;
+            }
+            
+            .game-sidebar {
+                width: 100%;
+            }
+            
+            .numpad {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 20px 15px;
+            }
+            
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .digit {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            
+            .row-number {
+                width: 50px;
+                font-size: 22px;
+            }
+            
+            .numpad {
+                grid-template-columns: repeat(4, 1fr);
+                padding: 15px;
+                gap: 6px;
+            }
+            
+            .numpad button {
+                height: 45px;
+                font-size: 16px;
+                padding: 8px;
+            }
+            
+            .numpad button.special {
+                grid-column: span 2;
+            }
+            
+            .hints {
+                padding: 15px;
+            }
+            
+            .hint-item {
+                font-size: 14px;
+            }
+            
+            .stat-box {
+                min-width: 150px;
+                padding: 12px 20px;
+            }
+            
+            .stat-value {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .digit {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+            
+            .digits {
+                gap: 6px;
+            }
+            
+            .numpad {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .stat-box {
+                min-width: 120px;
+                padding: 10px 15px;
+            }
+            
+            .stat-value {
+                font-size: 1.6rem;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .game-container {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* 结果弹窗 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: rgba(30, 20, 40, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 0 50px rgba(156, 39, 176, 0.6);
+            border: 2px solid var(--primary);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal h2 {
+            font-size: 2.8rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .modal p {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .code-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .code-digit {
+            width: 50px;
+            height: 50px;
+            background: rgba(156, 39, 176, 0.15);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .modal-btn {
+            padding: 14px 40px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 15px 10px;
+            display: inline-block;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(156, 39, 176, 0.5);
+        }
+
+        .difficulty-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--primary), var(--tertiary));
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hint-indicator {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--hint);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景星空 -->
+    <div class="stars" id="stars"></div>
+
+    <!-- 结果弹窗 -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">恭喜！密码破译成功</h2>
+            <p id="modalMessage">您展现了非凡的解码能力，成功破解了专家级密码！</p>
+            <div class="code-display" id="codeDisplay"></div>
+            <button class="modal-btn" id="modalBtn">再来一局</button>
+            <button class="modal-btn" id="backHomeBtn">返回主頁</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <a href="密碼破譯大師-主頁.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回主頁</a>
+        <div class="difficulty-badge">专家级挑战</div>
+
+        <div class="title-container">
+            <h1 class="title">破譯密碼 - 等級四</h1>
+            <div class="subtitle">挑战十位密码，包含重复数字，限十五次输入机会</div>
+            
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-value" id="chancesLeft">15</div>
+                    <div class="stat-label">剩余机会</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="hintsLeft">3</div>
+                    <div class="stat-label">剩余提示</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="attemptCount">0</div>
+                    <div class="stat-label">当前尝试</div>
+                </div>
+            </div>
+            
+            <button class="hint-btn" id="hintBtn">
+                <i class="fas fa-lightbulb"></i> 获取提示 (剩余: <span id="hintCount">3</span>)
+            </button>
+        </div>
+
+        <div class="game-content">
+            <div class="game-board">
+                <div class="guess-rows" id="guessRows">
+                    <!-- 猜測行將由JS生成 -->
+                </div>
+
+                <div class="numpad">
+                    <!-- 数字按钮1-20 -->
+                    <button data-digit="1">1</button>
+                    <button data-digit="2">2</button>
+                    <button data-digit="3">3</button>
+                    <button data-digit="4">4</button>
+                    <button data-digit="5">5</button>
+                    <button data-digit="6">6</button>
+                    <button data-digit="7">7</button>
+                    <button data-digit="8">8</button>
+                    <button data-digit="9">9</button>
+                    <button data-digit="10">10</button>
+                    <button data-digit="11">11</button>
+                    <button data-digit="12">12</button>
+                    <button data-digit="13">13</button>
+                    <button data-digit="14">14</button>
+                    <button data-digit="15">15</button>
+                    <button data-digit="16">16</button>
+                    <button data-digit="17">17</button>
+                    <button data-digit="18">18</button>
+                    <button data-digit="19">19</button>
+                    <button data-digit="20">20</button>
+                    <button class="special" id="deleteBtn"><i class="fas fa-backspace"></i> 刪除</button>
+                    <button class="special" id="submitBtn"><i class="fas fa-paper-plane"></i> 輸入</button>
+                </div>
+            </div>
+            
+            <div class="game-sidebar">
+                <div class="hints">
+                    <div class="hint-item">
+                        <i class="fas fa-info-circle"></i>
+                        <div>十位密碼，數字範圍 1-20</div>
+                    </div>
+                    <div class="hint-item">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div>包含兩個重複數字，其餘不重複</div>
+                    </div>
+                    <div class="hint-item">
+                        <i class="fas fa-square" style="color: #4CAF50;"></i>
+                        <div><span class="hint-color correct"></span> 綠色: 數字和位置都正確</div>
+                    </div>
+                    <div class="hint-item">
+                        <i class="fas fa-square" style="color: #FFC107;"></i>
+                        <div><span class="hint-color wrong-position"></span> 黃色: 數字正確但位置錯誤</div>
+                    </div>
+                    <div class="hint-item">
+                        <i class="fas fa-square" style="color: #f44336;"></i>
+                        <div><span class="hint-color not-in-code"></span> 紅色: 數字不在密碼中</div>
+                    </div>
+                    <div class="hint-item">
+                        <i class="fas fa-square" style="color: #03a9f4;"></i>
+                        <div><span class="hint-color hint"></span> 藍色: 提示數字 (显示1秒)</div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>解碼進度</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="history-panel">
+                    <div class="history-title">
+                        <i class="fas fa-history"></i> 猜測歷史
+                    </div>
+                    <div id="historyList">
+                        <!-- 历史记录将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 创建星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // 随机位置
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                
+                // 随机大小
+                const size = Math.random() * 3;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // 随机透明度
+                star.style.setProperty('--opacity', Math.random() * 0.8 + 0.2);
+                
+                // 随机动画时长
+                star.style.setProperty('--duration', `${Math.random() * 4 + 3}s`);
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // 游戏变量
+        let secretCode = [];
+        let currentAttempt = 1;
+        let currentDigits = [];
+        let isProcessing = false;
+        let gameEnded = false;
+        let hintsUsed = 0;
+        const maxAttempts = 15;
+        const codeLength = 10;
+        const maxHints = 3;
+        const numberRange = 20;
+
+        // DOM元素
+        const guessRows = document.getElementById('guessRows');
+        const chancesLeft = document.getElementById('chancesLeft');
+        const hintsLeft = document.getElementById('hintsLeft');
+        const hintCount = document.getElementById('hintCount');
+        const attemptCount = document.getElementById('attemptCount');
+        const resultModal = document.getElementById('resultModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const codeDisplay = document.getElementById('codeDisplay');
+        const modalBtn = document.getElementById('modalBtn');
+        const backHomeBtn = document.getElementById('backHomeBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const historyList = document.getElementById('historyList');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+
+        // 初始化游戏
+        function initGame() {
+            secretCode = generateCode();
+            console.log("密码是：", secretCode.join(' '));
+            generateGuessRows();
+            setupEventListeners();
+            updateNumpadState();
+            updateHints();
+            
+            chancesLeft.textContent = maxAttempts;
+            hintsLeft.textContent = maxHints;
+            hintCount.textContent = maxHints;
+            attemptCount.textContent = currentAttempt;
+            currentAttempt = 1;
+            currentDigits = [];
+            hintsUsed = 0;
+            gameEnded = false;
+            historyList.innerHTML = '<div class="history-item">暂无历史记录</div>';
+            updateProgress();
+        }
+
+        // 生成密码（包含一个重复数字）
+        function generateCode() {
+            const numbers = Array.from({length: numberRange}, (_, i) => i + 1);
+            const code = [];
+            
+            // 随机选择一个数字用于重复
+            const duplicateNum = numbers[Math.floor(Math.random() * numbers.length)];
+            
+            // 先添加9个不重复数字
+            for (let i = 0; i < codeLength - 1; i++) {
+                const index = Math.floor(Math.random() * numbers.length);
+                code.push(numbers.splice(index, 1)[0]);
+            }
+            
+            // 添加重复数字
+            code.push(duplicateNum);
+            
+            // 打乱顺序
+            for (let i = code.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [code[i], code[j]] = [code[j], code[i]];
+            }
+            
+            return code;
+        }
+
+        // 生成猜测行
+        function generateGuessRows() {
+            guessRows.innerHTML = '';
+            
+            for (let i = 1; i <= maxAttempts; i++) {
+                const row = document.createElement('div');
+                row.className = `guess-row${i === 1 ? ' active' : ''}`;
+                row.id = `row-${i}`;
+                
+                const rowNumber = document.createElement('div');
+                rowNumber.className = 'row-number';
+                rowNumber.textContent = i.toString().padStart(2, '0');
+                
+                const digits = document.createElement('div');
+                digits.className = 'digits';
+                
+                for (let j = 0; j < codeLength; j++) {
+                    const digit = document.createElement('div');
+                    digit.className = 'digit';
+                    digit.dataset.position = j;
+                    digits.appendChild(digit);
+                }
+                
+                row.appendChild(rowNumber);
+                row.appendChild(digits);
+                guessRows.appendChild(row);
+            }
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 数字按钮
+            document.querySelectorAll('.numpad button[data-digit]').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (!isProcessing && !gameEnded) {
+                        const digit = parseInt(button.dataset.digit);
+                        inputDigit(digit);
+                    }
+                });
+            });
+
+            // 删除按钮
+            document.getElementById('deleteBtn').addEventListener('click', () => {
+                if (!isProcessing && !gameEnded) {
+                    deleteLastDigit();
+                }
+            });
+
+            // 提交按钮
+            document.getElementById('submitBtn').addEventListener('click', () => {
+                if (!isProcessing && !gameEnded) {
+                    submitGuess();
+                }
+            });
+
+            // 提示按钮
+            hintBtn.addEventListener('click', () => {
+                if (!isProcessing && !gameEnded && hintsUsed < maxHints) {
+                    useHint();
+                }
+            });
+
+            // 键盘事件
+            document.addEventListener('keydown', (event) => {
+                if (!isProcessing && !gameEnded) {
+                    if (event.key >= '0' && event.key <= '9') {
+                        inputDigit(parseInt(event.key));
+                    } else if (event.key === 'Backspace') {
+                        deleteLastDigit();
+                    } else if (event.key === 'Enter') {
+                        submitGuess();
+                    }
+                }
+            });
+            
+            // 模态框按钮
+            modalBtn.addEventListener('click', () => {
+                resultModal.classList.remove('active');
+                setTimeout(initGame, 300);
+            });
+            
+            backHomeBtn.addEventListener('click', () => {
+                window.location.href = 'deepseek_html_20250615_a1309b.html';
+            });
+        }
+
+        // 输入数字
+        function inputDigit(digit) {
+            if (currentDigits.length >= codeLength) return;
+            
+            currentDigits.push(digit);
+            updateDisplay();
+        }
+
+        // 删除最后一位数字
+        function deleteLastDigit() {
+            if (currentDigits.length > 0) {
+                currentDigits.pop();
+                updateDisplay();
+            }
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            const activeRow = document.querySelector('.guess-row.active');
+            if (!activeRow) return;
+            
+            const digits = activeRow.querySelectorAll('.digit');
+            digits.forEach((digit, index) => {
+                if (currentDigits[index]) {
+                    digit.textContent = currentDigits[index];
+                    digit.classList.add('filled');
+                } else {
+                    digit.textContent = '';
+                    digit.classList.remove('filled');
+                }
+            });
+        }
+
+        // 使用提示 - 显示正确数字1秒后消失
+        function useHint() {
+            if (hintsUsed >= maxHints || gameEnded) return;
+            
+            hintsUsed++;
+            updateHints();
+            
+            // 收集所有尚未被揭示的位置索引
+            const unrevealedPositions = [];
+            secretCode.forEach((digit, index) => {
+                const row = document.querySelector(`#row-${currentAttempt}`);
+                if (row) {
+                    const digitEl = row.querySelector(`.digit[data-position="${index}"]`);
+                    // 检查该位置是否已被揭示
+                    if (digitEl && !digitEl.classList.contains('correct')) {
+                        unrevealedPositions.push(index);
+                    }
+                }
+            });
+            
+            if (unrevealedPositions.length > 0) {
+                const randomIndex = unrevealedPositions[Math.floor(Math.random() * unrevealedPositions.length)];
+                const row = document.querySelector(`#row-${currentAttempt}`);
+                const digitEl = row.querySelector(`.digit[data-position="${randomIndex}"]`);
+                
+                // 保存当前显示内容
+                const originalContent = digitEl.textContent;
+                const originalClasses = digitEl.className;
+                
+                // 显示正确的数字并添加提示样式
+                digitEl.textContent = secretCode[randomIndex];
+                digitEl.className = 'digit hint-digit';
+                digitEl.classList.add('filled');
+                
+                // 1.5秒后恢复原始状态
+                setTimeout(() => {
+                    digitEl.textContent = originalContent;
+                    digitEl.className = originalClasses;
+                    if (originalContent) {
+                        digitEl.classList.add('filled');
+                    }
+                }, 1500);
+            }
+        }
+
+        // 更新提示状态
+        function updateHints() {
+            const remaining = maxHints - hintsUsed;
+            hintsLeft.textContent = remaining;
+            hintCount.textContent = remaining;
+            hintBtn.disabled = remaining <= 0;
+        }
+
+        // 更新进度
+        function updateProgress() {
+            const progress = ((currentAttempt - 1) / maxAttempts) * 100;
+            progressFill.style.width = `${progress}%`;
+            progressPercent.textContent = `${Math.round(progress)}%`;
+        }
+
+        // 添加历史记录
+        function addHistory(guess, result) {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            
+            const guessStr = guess.join(' ');
+            const correctCount = result.filter(r => r === 'correct').length;
+            const wrongPositionCount = result.filter(r => r === 'wrong-position').length;
+            
+            historyItem.innerHTML = `
+                <strong>尝试 ${currentAttempt}:</strong> ${guessStr} 
+                <span style="color: #4CAF50">✓${correctCount}</span>
+                <span style="color: #FFC107">△${wrongPositionCount}</span>
+            `;
+            
+            if (historyList.firstChild.textContent === '暂无历史记录') {
+                historyList.innerHTML = '';
+            }
+            
+            historyList.prepend(historyItem);
+        }
+
+        // 提交猜测
+        function submitGuess() {
+            if (currentDigits.length !== codeLength) {
+                alert(`請輸入${codeLength}位數字！`);
+                return;
+            }
+
+            isProcessing = true;
+            const result = checkGuess();
+            updateRowStatus(result);
+            addHistory([...currentDigits], result);
+
+            if (result.every(r => r === 'correct')) {
+                gameEnded = true;
+                setTimeout(() => {
+                    showResultModal(true);
+                }, 1000);
+                return;
+            }
+
+            currentAttempt++;
+            chancesLeft.textContent = maxAttempts - currentAttempt + 1;
+            attemptCount.textContent = currentAttempt;
+            currentDigits = [];
+            updateProgress();
+
+            if (currentAttempt > maxAttempts) {
+                gameEnded = true;
+                setTimeout(() => {
+                    showResultModal(false);
+                }, 1000);
+            }
+        }
+
+        // 检查猜测结果（支持重复数字）
+        function checkGuess() {
+            const result = new Array(codeLength).fill('not-in-code');
+            const secretCopy = [...secretCode];
+            const guessCopy = [...currentDigits];
+            const usedIndices = new Set();
+
+            // 先检查完全匹配的位置
+            guessCopy.forEach((digit, i) => {
+                if (digit === secretCopy[i]) {
+                    result[i] = 'correct';
+                    secretCopy[i] = null; // 标记已匹配
+                    guessCopy[i] = null;
+                    usedIndices.add(i);
+                }
+            });
+
+            // 检查数字存在但位置不对的情况
+            guessCopy.forEach((digit, i) => {
+                if (digit !== null) {
+                    for (let j = 0; j < secretCopy.length; j++) {
+                        if (!usedIndices.has(j) && digit === secretCopy[j]) {
+                            result[i] = 'wrong-position';
+                            secretCopy[j] = null; // 标记已匹配
+                            usedIndices.add(j);
+                            break;
+                        }
+                    }
+                }
+            });
+
+            return result;
+        }
+
+        // 更新行状态
+        function updateRowStatus(result) {
+            const activeRow = document.querySelector('.guess-row.active');
+            const digits = activeRow.querySelectorAll('.digit');
+            
+            digits.forEach((digit, index) => {
+                const resultClass = result[index];
+                digit.className = `digit ${resultClass}`;
+                
+                if (resultClass === 'correct') {
+                    digit.innerHTML += '<span class="symbol">✓</span>';
+                } else if (resultClass === 'wrong-position') {
+                    digit.innerHTML += '<span class="symbol">△</span>';
+                } else {
+                    digit.innerHTML += '<span class="symbol">✗</span>';
+                }
+            });
+
+            activeRow.classList.remove('active');
+            if (currentAttempt < maxAttempts) {
+                const nextRow = document.querySelector(`.guess-row:nth-child(${currentAttempt + 1})`);
+                nextRow.classList.add('active');
+            }
+            
+            isProcessing = false;
+        }
+
+        // 显示结果模态框
+        function showResultModal(isWin) {
+            if (isWin) {
+                modalTitle.textContent = '恭喜！密码破译成功';
+                modalMessage.textContent = `您在第 ${currentAttempt} 次尝试中成功破解了专家级密码！`;
+            } else {
+                modalTitle.textContent = '挑戰失敗';
+                modalMessage.textContent = '很遗憾，您没有在规定的次数内破解密码。';
+            }
+            
+            // 显示密码
+            codeDisplay.innerHTML = '';
+            secretCode.forEach(digit => {
+                const digitEl = document.createElement('div');
+                digitEl.className = 'code-digit';
+                digitEl.textContent = digit;
+                codeDisplay.appendChild(digitEl);
+            });
+            
+            resultModal.classList.add('active');
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            initGame();
+        });
+    </script>
+</body>
+</html>

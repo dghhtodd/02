@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>密碼破譯大師</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #00c3ff;
+            --secondary: #0066cc;
+            --expert: #9c27b0;
+            --master: #ff9800;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #f44336;
+            --dark: #0a1929;
+            --darker: #061220;
+            --light: #f0f8ff;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(0, 195, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 102, 204, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 30% 70%, rgba(156, 39, 176, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 70% 30%, rgba(255, 152, 0, 0.1) 0%, transparent 20%);
+            z-index: -1;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--duration, 5s) infinite ease-in-out;
+            opacity: var(--opacity, 0.7);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 0 40px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0, 195, 255, 0.7);
+            animation: glow 2s ease-in-out infinite alternate;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(0, 195, 255, 0.5); }
+            to { text-shadow: 0 0 25px rgba(0, 195, 255, 0.8), 0 0 40px rgba(0, 195, 255, 0.6); }
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: #a0d2ff;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .level-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        .level-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 35px 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .level-card.level-1::before {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .level-card.level-2::before {
+            background: linear-gradient(90deg, var(--success), #2e7d32);
+        }
+        
+        .level-card.level-3::before {
+            background: linear-gradient(90deg, var(--expert), #7b1fa2);
+        }
+        
+        .level-card.level-4::before {
+            background: linear-gradient(90deg, var(--master), #ef6c00);
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .level-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .level-card:hover::before {
+            opacity: 1;
+        }
+
+        .level-card h2 {
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .level-1 h2 {
+            color: var(--primary);
+        }
+        
+        .level-2 h2 {
+            color: var(--success);
+        }
+        
+        .level-3 h2 {
+            color: var(--expert);
+        }
+        
+        .level-4 h2 {
+            color: var(--master);
+        }
+
+        .level-card h2 i {
+            font-size: 1.5rem;
+        }
+
+        .level-card p {
+            color: #e0f0ff;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            min-height: 60px;
+        }
+
+        .level-card ul {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .level-card ul li {
+            margin: 12px 0;
+            color: #c0e0ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .level-card ul li i {
+            font-size: 1.2rem;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .level-1 ul li i {
+            color: var(--primary);
+            background: rgba(0, 195, 255, 0.1);
+        }
+        
+        .level-2 ul li i {
+            color: var(--success);
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .level-3 ul li i {
+            color: var(--expert);
+            background: rgba(156, 39, 176, 0.1);
+        }
+        
+        .level-4 ul li i {
+            color: var(--master);
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 35px;
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        
+        .level-1 .btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            box-shadow: 0 5px 15px rgba(0, 195, 255, 0.3);
+        }
+        
+        .level-2 .btn {
+            background: linear-gradient(45deg, var(--success), #2e7d32);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .level-3 .btn {
+            background: linear-gradient(45deg, var(--expert), #7b1fa2);
+            box-shadow: 0 5px 15px rgba(156, 39, 176, 0.3);
+        }
+        
+        .level-4 .btn {
+            background: linear-gradient(45deg, var(--master), #ef6c00);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .level-1 .btn:hover {
+            box-shadow: 0 8px 20px rgba(0, 195, 255, 0.5);
+        }
+        
+        .level-2 .btn:hover {
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.5);
+        }
+        
+        .level-3 .btn:hover {
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.5);
+        }
+        
+        .level-4 .btn:hover {
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .difficulty {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 6px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .level-1 .difficulty {
+            background: rgba(0, 195, 255, 0.2);
+            border: 1px solid rgba(0, 195, 255, 0.4);
+        }
+        
+        .level-2 .difficulty {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.4);
+        }
+        
+        .level-3 .difficulty {
+            background: rgba(156, 39, 176, 0.2);
+            border: 1px solid rgba(156, 39, 176, 0.4);
+        }
+        
+        .level-4 .difficulty {
+            background: rgba(255, 152, 0, 0.2);
+            border: 1px solid rgba(255, 152, 0, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 0 20px;
+            color: #80c0ff;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 25px;
+            width: 260px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            background: rgba(0, 195, 255, 0.1);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+        }
+
+        .feature-card h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .feature-card p {
+            color: #a0d2ff;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin: 40px 0 20px;
+            color: var(--primary);
+            font-size: 2rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .level-cards {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .level-cards {
+                gap: 25px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 40px 0 20px;
+            }
+            
+            header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .level-cards {
+                gap: 20px;
+                padding: 10px;
+            }
+            
+            .level-card {
+                padding: 25px 20px;
+            }
+            
+            .features {
+                gap: 20px;
+            }
+            
+            .feature-card {
+                width: 100%;
+                max-width: 350px;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .level-card h2 {
+                font-size: 1.5rem;
+            }
+            
+            .btn {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 1.6rem;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .level-card {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .level-card:nth-child(1) { animation-delay: 0.1s; }
+        .level-card:nth-child(2) { animation-delay: 0.2s; }
+        .level-card:nth-child(3) { animation-delay: 0.3s; }
+        .level-card:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- 背景星空 -->
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-lock"></i> 密碼破譯大師</h1>
+            <p>挑戰你的邏輯推理能力，運用策略與智慧，成為最強密碼破譯專家！每一關都有獨特的挑戰，準備好測試你的解碼技巧了嗎？</p>
+        </header>
+
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-brain"></i>
+                <h3>邏輯推理</h3>
+                <p>運用策略性思維分析線索，找出隱藏的數字模式，挑戰你的認知極限。</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>漸進難度</h3>
+                <p>從簡單的4位密碼到複雜的10位密碼，難度逐步提升，不斷挑戰自我。</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-palette"></i>
+                <h3>視覺反饋</h3>
+                <p>直觀的顏色提示系統，幫助你快速理解猜測結果，調整解碼策略。</p>
+            </div>
+        </div>
+        
+        <h2 class="section-title">挑戰等級</h2>
+
+        <div class="level-cards">
+            <div class="level-card level-1">
+                <div class="difficulty">初學者</div>
+                <h2><i class="fas fa-user-graduate"></i> 等級一：密碼學徒</h2>
+                <p>踏上密碼破譯之旅的第一步，掌握基本技巧，為更高級的挑戰做好準備。</p>
+                <ul>
+                    <li><i class="fas fa-key"></i> 四位數字密碼挑戰</li>
+                    <li><i class="fas fa-redo"></i> 六次破解機會</li>
+                    <li><i class="fas fa-lightbulb"></i> 即時顏色提示系統</li>
+                    <li><i class="fas fa-user"></i> 適合入門級挑戰者</li>
+                </ul>
+                <a href="密碼破譯大師-等級一.html" class="btn">開始挑戰 <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="level-card level-2">
+                <div class="difficulty">進階者</div>
+                <h2><i class="fas fa-user-ninja"></i> 等級二：進階解密師</h2>
+                <p>提升你的破解技巧，迎接更大挑戰，展示你的解碼天賦與策略思維。</p>
+                <ul>
+                    <li><i class="fas fa-key"></i> 六位數字密碼挑戰</li>
+                    <li><i class="fas fa-redo"></i> 十次破解機會</li>
+                    <li><i class="fas fa-expand"></i> 擴展的數字範圍</li>
+                    <li><i class="fas fa-chess"></i> 需要更強的策略思維</li>
+                </ul>
+                <a href="密碼破譯大師-等級二.html" class="btn">接受挑戰 <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="level-card level-3">
+                <div class="difficulty">專家級</div>
+                <h2><i class="fas fa-crown"></i> 等級三：密碼大師</h2>
+                <p>終極挑戰，證明你的實力！只有真正的解碼大師才能完成這項艱鉅任務。</p>
+                <ul>
+                    <li><i class="fas fa-key"></i> 八位數字密碼終極戰</li>
+                    <li><i class="fas fa-redo"></i> 十二次破解機會</li>
+                    <li><i class="fas fa-fire"></i> 最高難度挑戰</li>
+                    <li><i class="fas fa-trophy"></i> 成為真正的密碼大師</li>
+                </ul>
+                <a href="密碼破譯大師-等級三.html" class="btn">挑戰極限 <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="level-card level-4">
+                <div class="difficulty">宗師級</div>
+                <h2><i class="fas fa-dragon"></i> 等級四：密碼宗師</h2>
+                <p>不可能的挑戰！只有真正的密碼破譯宗師才能完成這項史詩級任務。</p>
+                <ul>
+                    <li><i class="fas fa-key"></i> 十位數字密碼終極戰</li>
+                    <li><i class="fas fa-redo"></i> 十五次破解機會</li>
+                    <li><i class="fas fa-brain"></i> 包含重複數字</li>
+                    <li><i class="fas fa-star"></i> 新增提示系統</li>
+                </ul>
+                <a href="密碼破譯大師-等級四.html" class="btn">挑戰宗師 <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+        
+        <h2 class="section-title">遊戲特色</h2>
+        
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-history"></i>
+                <h3>歷史記錄</h3>
+                <p>查看您的解碼歷史，分析策略，不斷改進您的破譯技巧。</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-lightbulb"></i>
+                <h3>智能提示</h3>
+                <p>在高等級中獲得智能提示，幫助您突破解碼瓶頸。</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-bar"></i>
+                <h3>進度追蹤</h3>
+                <p>直觀的進度指示器，讓您清晰了解解碼進展情況。</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 密碼破譯大師 | 設計與開發：解碼團隊 | 用 ❤️ 製作</p>
+            <p style="margin-top: 10px; font-size: 0.8rem; color: #6080a0;">
+                <i class="fas fa-shield-alt"></i> 所有遊戲數據僅存儲在您的設備上，保障隱私安全
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 创建星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // 随机位置
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                
+                // 随机大小
+                const size = Math.random() * 3;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // 随机透明度
+                star.style.setProperty('--opacity', Math.random() * 0.8 + 0.2);
+                
+                // 随机动画时长
+                star.style.setProperty('--duration', `${Math.random() * 4 + 3}s`);
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // 添加卡片悬停效果
+        function addCardHoverEffect() {
+            const cards = document.querySelectorAll('.level-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-15px)';
+                    card.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.5)';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                    card.style.boxShadow = '0 10px 40px rgba(0, 0, 0, 0.4)';
+                });
+            });
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            addCardHoverEffect();
+            
+            // 添加按钮涟漪效果
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const x = e.clientX - e.target.getBoundingClientRect().left;
+                    const y = e.clientY - e.target.getBoundingClientRect().top;
+                    
+                    const ripple = document.createElement('span');
+                    ripple.classList.add('ripple');
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
