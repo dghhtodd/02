@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e3e5dc">
+<title>成就與提示卡 | 密碼破譯大師</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="description" content="查看已解鎖的成就徽章與提示卡數量。解鎖成就可獲得提示卡。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body class="page-hub">
+<div class="shell">
+
+  <header class="appbar">
+    <a class="appbar__back" href="密碼破譯大師-主頁.html">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10 3 5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>主頁</span>
+    </a>
+    <span class="appbar__title">密碼破譯大師</span>
+  </header>
+
+  <main class="wrap hub">
+
+    <header class="masthead masthead--compact">
+      <h1 class="masthead__title">成就與提示卡</h1>
+      <div class="masthead__meta">
+        <span>共 17 個徽章</span>
+        <span>進度只存於此裝置</span>
+      </div>
+    </header>
+
+    <section class="walletbar" id="walletReading" aria-label="提示卡與徽章進度"></section>
+
+    <section class="section">
+      <h2 class="section-title">徽章</h2>
+      <div class="stampbook" id="badges"></div>
+    </section>
+
+    <section class="section section--quiet">
+      <h2 class="section-title">重設</h2>
+      <button class="btn btn--danger" id="resetBtn" type="button">清除所有進度</button>
+      <p class="notice">只會清除此裝置的紀錄，無法復原。</p>
+    </section>
+
+  </main>
+
+  <footer class="wrap footer">
+    <p>所有進度只存在此裝置的瀏覽器內，不會上傳。</p>
+    <p>© <span id="year"></span> 密碼破譯大師</p>
+  </footer>
+
+</div>
+
+<dialog class="result" id="resetDialog">
+  <h2 class="dialog__title">確定清除？</h2>
+  <p class="dialog__body">成就、紀錄、提示卡與日曆都會刪除，無法復原。</p>
+  <div class="dialog__actions">
+    <button class="btn btn--primary" id="resetYes" type="button">確定清除</button>
+    <button class="btn" id="resetNo" type="button">不要清除</button>
+  </div>
+</dialog>
+
+<script>window.MM_PAGE = { kind: "ach" };</script>
+<script src="assets/engine.js"></script>
+<script src="assets/hub.js"></script>
+</body>
+</html>

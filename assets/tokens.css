@@ -1,0 +1,167 @@
+/* 密碼破譯大師 · 設計語彙：譯碼室檔案
+   一張檔案紙、一支黑墨、一枚印泥、一疊藍曬。
+   紅只給人（行動與蓋印），藍只給機器（提示），墨給判定。
+   所有顏色與字體只在這裡宣告，其餘檔案一律引用 token。 */
+
+:root {
+  /* 紙：三層明度，由淺到凹 */
+  --color-paper: #e3e5dc;
+  --color-paper-2: #eff0e9;
+  --color-paper-3: #d4d7ce;
+
+  /* 墨：主墨、次墨、淡墨 */
+  --color-ink: #161a18;
+  --color-ink-2: #3b423e;
+  --color-muted: #5c635d;
+
+  /* 規線 */
+  --color-rule: #b6bcb1;
+  --color-rule-2: #8a9187;
+
+  /* 印泥紅：人手動作、蓋印、今日 */
+  --color-seal: #a93428;
+  --color-seal-deep: #7c231a;
+  --color-seal-soft: #ead4ce;
+
+  /* 通用訊號 */
+  --color-accent: var(--color-seal);
+  --color-accent-ink: #f6f3ea;
+  --color-accent-soft: var(--color-seal-soft);
+  --color-focus: #161a18;
+
+  /* 藍曬：機器提示與「位置錯了」 */
+  --color-cool: #1e5a61;
+  --color-cool-soft: #d3e1e0;
+
+  /* 判定與生命 */
+  --color-ok: #161a18;
+  --color-ok-soft: #d4d7ce;
+  --color-bad: #a93428;
+  --color-bad-soft: #ead4ce;
+
+  /* 字體：宋體做標題，黑體做正文，打字機體做數字 */
+  --font-display: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC", sans-serif;
+  --font-mono: "Courier Prime", "Courier New", ui-monospace, monospace;
+
+  --tracking-display: 0.015em;
+  --display-weight: 700;
+  --reading-weight: 700;
+
+  /* 排版 */
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 1rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.25rem;
+  --text-2xl: clamp(1.35rem, 1.15rem + 1vw, 1.75rem);
+  --text-display: clamp(2.7rem, 1.35rem + 5.5vw, 4.6rem);
+  --text-reading: clamp(1.6rem, 1.35rem + 1.2vw, 2rem);
+
+  /* 空間 */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --gutter: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+
+  /* 形狀：紙與表單只有極小的切角，沒有浮起的陰影 */
+  --radius-card: 3px;
+  --radius-pill: 2px;
+  --rule-hair: 1px;
+  --shadow-card: none;
+
+  /* 動態 */
+  --dur-micro: 110ms;
+  --dur-short: 200ms;
+  --dur-long: 380ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --ease-in: cubic-bezier(0.6, 0.05, 0.7, 0.2);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+html {
+  color-scheme: light;
+  scrollbar-color: var(--color-rule-2) transparent;
+  caret-color: var(--color-seal);
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.7;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-seal-soft);
+  color: var(--color-ink);
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+}
+
+hr {
+  border: none;
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+::placeholder {
+  color: var(--color-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}
